@@ -1,0 +1,28 @@
+<% layout('layouts/boilerplate')%>
+
+    <div class="row">
+        <h1 class="text-center">Edit Content</h1>
+        <div class="col-6 offset-3">
+            <form action="/contents/<%= content._id %>?_method=PUT" method="POST">
+                <div class="mb-3">
+                    <label class="form-label" for="title">Title</label>
+                   <input class="form-control" type="text" id="title" name= "content[title]" value="<%= content.title%> ">
+                
+                </div>
+            
+                <div class="mb-3">
+                    <label class="form-label" for="image">Image Url</label>
+                    <input class="form-control" type="text" id="image" name="content[image]" value="<%= content.image %>">
+                </div>
+    
+                <div class="mb-3">
+                    <label class="form-label" for="story">Story</label>
+                    <input class="form-control" type="text" id="story" name= "content[story]" value="<%= content.story %> ">
+                </div>
+                <div class="mb-3">
+                    <button class="btn btn-success">Update Content</button>
+                </div>
+            </form>
+            <a href="/contents/<%= content._id %>">Back to Content </a>
+        </div>
+    </div>
