@@ -6,8 +6,12 @@ const Content = require('./models/content');
 const methodOverride = require('method-override');
 const ejsMate  = require('ejs-mate');
 const catchAsync = require('./utils/catchAsync');
+const {contentSchema} = require('./schemas');
 const { nextTick } = require('process');
+const Joi = require('joi');
 const ExpressError = require('./utils/ExpressError');
+const content = require('./models/content');
+const { validate } = require('./models/content');
 
 mongoose.connect('mongodb://localhost:27017/prati-lipi',{
     useNewUrlParser: true,
@@ -28,6 +32,16 @@ app.set('views',path.join(__dirname,'views'));
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 
+const validateContent = (req,res,next) =>{
+    const {error} = contentSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
+
 app.get('/',(req,res) =>{
     res.render('home');
 })
@@ -46,15 +60,13 @@ app.get('/contents/:id',catchAsync( async(req,res) =>{
     res.render('contents/show', {content});
 }));
 
-app.post('/contents',catchAsync( async(req,res,next) =>{
+app.post('/contents', validateContent, catchAsync( async(req,res,next) =>{
         var date = new Date(); 
         var dd = date.getDate(); 
         var mm = date.getMonth() + 1; 
         var yyyy = date.getFullYear(); 
         var newDate = dd + "/" + mm + "/" +yyyy;
         req.body.content.datePublished = newDate;
-        //console.log(req.body);
-        if(!req.body.content) throw new ExpressError('Invalid Content', 400);
 
         const content = new Content(req.body.content);
         await content.save();
@@ -66,7 +78,7 @@ app.get('/contents/:id/edit' , catchAsync(async(req,res) =>{
     res.render('contents/edit', {content});
 }));
 
-app.put('/contents/:id', catchAsync(async(req,res) =>{
+app.put('/contents/:id', validateContent ,catchAsync(async(req,res) =>{
     const content =  await Content.findByIdAndUpdate(req.params.id, {... req.body.content});
     res.redirect(`/contents/${content._id}`);
 }));
@@ -82,8 +94,9 @@ app.all('*',(req,res,next) =>{
 })
 
 app.use((err,req,res,next) =>{
-    const {statusCode = 500, message = 'Something went wrong !!'} = err;
-    res.status(statusCode).send(message);
+    const {statusCode = 500} = err;
+    if(!err.message) err.message = 'OH NO ! SOMETHING WENT WRONG';  
+    res.status(statusCode).render('error', {err});
 })
 
 app.listen(3000,() => {
