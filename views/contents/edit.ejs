@@ -1,23 +1,30 @@
 <% layout('layouts/boilerplate')%>
-
     <div class="row">
         <h1 class="text-center">Edit Content</h1>
         <div class="col-6 offset-3">
-            <form action="/contents/<%= content._id %>?_method=PUT" method="POST">
+            <form action="/contents/<%= content._id %>?_method=PUT" method="POST" novalidate class="validated=form">
                 <div class="mb-3">
                     <label class="form-label" for="title">Title</label>
-                   <input class="form-control" type="text" id="title" name= "content[title]" value="<%= content.title%> ">
-                
-                </div>
+                   <input class="form-control" type="text" id="title" name= "content[title]" value="<%= content.title%> " required>
+                    <div class="valid-feedback">
+                     Looks good!
+                    </div>
+                </div>  
             
                 <div class="mb-3">
                     <label class="form-label" for="image">Image Url</label>
-                    <input class="form-control" type="text" id="image" name="content[image]" value="<%= content.image %>">
+                    <input class="form-control" type="text" id="image" name="content[image]" value="<%= content.image %>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
     
                 <div class="mb-3">
                     <label class="form-label" for="story">Story</label>
-                    <input class="form-control" type="text" id="story" name= "content[story]" value="<%= content.story %> ">
+                    <input class="form-control" type="text" id="story" name= "content[story]" value="<%= content.story %> " required >
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
                 <div class="mb-3">
                     <button class="btn btn-success">Update Content</button>

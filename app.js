@@ -5,6 +5,9 @@ const mongoose = require('mongoose');
 const Content = require('./models/content');
 const methodOverride = require('method-override');
 const ejsMate  = require('ejs-mate');
+const catchAsync = require('./utils/catchAsync');
+const { nextTick } = require('process');
+const ExpressError = require('./utils/ExpressError');
 
 mongoose.connect('mongodb://localhost:27017/prati-lipi',{
     useNewUrlParser: true,
@@ -29,40 +32,58 @@ app.get('/',(req,res) =>{
     res.render('home');
 })
 
-app.get('/contents',async(req,res) => {
+app.get('/contents',catchAsync( async(req,res) => {
     const contents = await Content.find({});
     res.render('contents/index', {contents});
-})
+}));
 
 app.get('/contents/new', (req,res) => {
     res.render('contents/new');
 })
 
-app.get('/contents/:id', async(req,res) =>{
+app.get('/contents/:id',catchAsync( async(req,res) =>{
     const content = await Content.findById(req.params.id);
     res.render('contents/show', {content});
-})
+}));
 
-app.post('/contents', async(req,res) =>{
-    const content = new Content(req.body.content);
-    await content.save();
-    res.redirect(`/contents/${content._id}`);
-})
+app.post('/contents',catchAsync( async(req,res,next) =>{
+        var date = new Date(); 
+        var dd = date.getDate(); 
+        var mm = date.getMonth() + 1; 
+        var yyyy = date.getFullYear(); 
+        var newDate = dd + "/" + mm + "/" +yyyy;
+        req.body.content.datePublished = newDate;
+        //console.log(req.body);
+        if(!req.body.content) throw new ExpressError('Invalid Content', 400);
 
-app.get('/contents/:id/edit' ,async(req,res) =>{
+        const content = new Content(req.body.content);
+        await content.save();
+        res.redirect(`/contents/${content._id}`);
+}))
+
+app.get('/contents/:id/edit' , catchAsync(async(req,res) =>{
     const content = await Content.findById(req.params.id);
     res.render('contents/edit', {content});
-})
+}));
 
-app.put('/contents/:id', async(req,res) =>{
+app.put('/contents/:id', catchAsync(async(req,res) =>{
     const content =  await Content.findByIdAndUpdate(req.params.id, {... req.body.content});
     res.redirect(`/contents/${content._id}`);
-})
+}));
 
 app.delete('/contents/:id', async(req,res) =>{
     const { id } = req.params;
     await Content.findByIdAndDelete(id);
     res.redirect('/contents');
+})
+
+app.all('*',(req,res,next) =>{
+    next(new ExpressError('Page Not Found', 404));
+})
+
+app.use((err,req,res,next) =>{
+    const {statusCode = 500, message = 'Something went wrong !!'} = err;
+    res.status(statusCode).send(message);
 })
 
 app.listen(3000,() => {
