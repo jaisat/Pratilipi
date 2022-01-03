@@ -14,6 +14,13 @@ router.get('/new',isLoggedIn ,(req,res) => {
     res.render('contents/new');
 });
 
+router.get('/newcontent', async(req,res) =>{
+
+    const contents = await Content.find({}).sort({datePublished: -1});    
+    res.render('contents/index', {contents});
+    
+});
+
 router.get('/:id',catchAsync( async(req,res) =>{
     const content = await Content.findById(req.params.id).populate('author');
     if(!content){
@@ -26,11 +33,7 @@ router.get('/:id',catchAsync( async(req,res) =>{
 router.post('/',isLoggedIn, validateContent, catchAsync( async(req,res,next) =>{
         
         var date = new Date(); 
-        var dd = date.getDate(); 
-        var mm = date.getMonth() + 1; 
-        var yyyy = date.getFullYear(); 
-        var newDate = dd + "/" + mm + "/" +yyyy;
-        req.body.content.datePublished = newDate;
+        req.body.content.datePublished = date;
 
         const content = new Content(req.body.content);
         content.author = req.user._id;
@@ -60,5 +63,7 @@ router.delete('/:id',isLoggedIn,isAuthor, async(req,res) =>{
     await Content.findByIdAndDelete(id);
     res.redirect('/contents');
 })
+
+
 
 module.exports = router;

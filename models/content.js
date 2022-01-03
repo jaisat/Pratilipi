@@ -5,7 +5,7 @@ const ContentSchema = new Schema({
     title: String,
     image: String,
     story: String,
-    datePublished: String,
+    datePublished: Date,
     author :{
         type : Schema.Types.ObjectId,
         ref : 'User'

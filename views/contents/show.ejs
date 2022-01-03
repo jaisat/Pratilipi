@@ -18,7 +18,8 @@
                 <% } %> 
                 <p class="ml-3">Submitted By <%= content.author.username  %> </p>
                 <div class="card-footer text-muted">
-                    <p>Date Published: <%= content.datePublished %></p>
+                <% var currDate = content.datePublished.getDate() + "/" + content.datePublished.getMonth() + 1 +"/" +content.datePublished.getFullYear(); %> 
+                <p>Date Published: <%= currDate %> </p>
                 </div>
             </div>
         </div>

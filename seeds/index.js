@@ -19,13 +19,7 @@ const filename = "sample.csv";
 
 let ts = Date.now();
 
-let date_ob = new Date(ts);
-let date = date_ob.getDate();
-let month = date_ob.getMonth() + 1;
-let year = date_ob.getFullYear();
-
-// date & time in YYYY-MM-DD format
-var currDate = date + "/" + month + "/" + year ;
+let currDate = new Date(ts);
 var arrayToInsert = [];
 csvtojson().fromFile(filename).then(source => {
 for(var i = 0; i < source.length; i++){
