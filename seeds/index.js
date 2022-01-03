@@ -24,7 +24,7 @@ let date = date_ob.getDate();
 let month = date_ob.getMonth() + 1;
 let year = date_ob.getFullYear();
 
-// prints date & time in YYYY-MM-DD format
+// date & time in YYYY-MM-DD format
 var currDate = date + "/" + month + "/" + year ;
 var arrayToInsert = [];
 csvtojson().fromFile(filename).then(source => {
