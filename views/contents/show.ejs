@@ -7,13 +7,16 @@
                     <h5 class="card-title"><%= content.title%></h5>
                     <p class="card-text"><%=content.story%></p>
                 </div>
-    
+                
+                <% if(currentUser && content.author.equals(currentUser._id)){ %> 
                 <div class="card-body">
                     <a class="card-link btn btn-info" href="/contents/<%=content._id%>/edit">Edit</a>
                     <form class="d-inline" action="/contents/<%=content._id%>?_method=DELETE" method="POST">
                         <button class="btn btn-danger">Delete</button>
                     </form>
                 </div>
+                <% } %> 
+                <p class="ml-3">Submitted By <%= content.author.username  %> </p>
                 <div class="card-footer text-muted">
                     <p>Date Published: <%= content.datePublished %></p>
                 </div>

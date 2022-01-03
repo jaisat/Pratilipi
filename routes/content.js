@@ -1,20 +1,9 @@
 const express = require('express');
 const router  = express.Router();
 const catchAsync = require('../utils/catchAsync');
-const ExpressError = require('../utils/ExpressError');
 const Content = require('../models/content');
-const {contentSchema} = require('../schemas');
-const { isLoggedIn } = require('../middleware');
+const { isLoggedIn, isAuthor, validateContent } = require('../middleware');
 
-const validateContent = (req,res,next) =>{
-    const {error} = contentSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400)
-    } else {
-        next();
-    }
-}
 
 router.get('/',catchAsync( async(req,res) => {
     const contents = await Content.find({});
@@ -26,7 +15,7 @@ router.get('/new',isLoggedIn ,(req,res) => {
 });
 
 router.get('/:id',catchAsync( async(req,res) =>{
-    const content = await Content.findById(req.params.id);
+    const content = await Content.findById(req.params.id).populate('author');
     if(!content){
         req.flash('error' , 'Can not find the content');
         return res.redirect('/contents');
@@ -44,12 +33,13 @@ router.post('/',isLoggedIn, validateContent, catchAsync( async(req,res,next) =>{
         req.body.content.datePublished = newDate;
 
         const content = new Content(req.body.content);
+        content.author = req.user._id;
         await content.save();
         req.flash('success', 'Successfully made a new Content');
         res.redirect(`/contents/${content._id}`);
 }));
 
-router.get('/:id/edit' , isLoggedIn, catchAsync(async(req,res) =>{
+router.get('/:id/edit' , isLoggedIn,isAuthor, catchAsync(async(req,res) =>{
     const content = await Content.findById(req.params.id);
     if(!content){
         req.flash('error' , 'Can not find the content');
@@ -58,13 +48,14 @@ router.get('/:id/edit' , isLoggedIn, catchAsync(async(req,res) =>{
     res.render('contents/edit', {content});
 }));
 
-router.put('/:id',isLoggedIn, validateContent ,catchAsync(async(req,res) =>{
-    const content =  await Content.findByIdAndUpdate(req.params.id, {... req.body.content});
+router.put('/:id',isLoggedIn, isAuthor, validateContent ,catchAsync(async(req,res) =>{
+    const { id } = req.params;
+    const content = await Content.findByIdAndUpdate(id, {...req.body.content});
     req.flash('success', 'Successfully updated the Content');
     res.redirect(`/contents/${content._id}`);
 }));
 
-router.delete('/:id',isLoggedIn, async(req,res) =>{
+router.delete('/:id',isLoggedIn,isAuthor, async(req,res) =>{
     const { id } = req.params;
     await Content.findByIdAndDelete(id);
     res.redirect('/contents');
