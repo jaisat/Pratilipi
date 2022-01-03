@@ -6,6 +6,5 @@ module.exports.contentSchema = Joi.object({
         title: Joi.string().required(),
         image: Joi.string().required(),
         story: Joi.string().required(),
-        datePublished: Joi.string().required()
     }).required()
 });
