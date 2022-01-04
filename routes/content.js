@@ -2,6 +2,7 @@ const express = require('express');
 const router  = express.Router();
 const catchAsync = require('../utils/catchAsync');
 const Content = require('../models/content');
+const User = require('../models/user');
 const { isLoggedIn, isAuthor, validateContent } = require('../middleware');
 
 
@@ -17,6 +18,13 @@ router.get('/new',isLoggedIn ,(req,res) => {
 router.get('/newcontent', async(req,res) =>{
 
     const contents = await Content.find({}).sort({datePublished: -1});    
+    res.render('contents/index', {contents});
+    
+});
+
+router.get('/mostliked', async(req,res) =>{
+
+    const contents = await Content.find({}).sort({like: -1});  
     res.render('contents/index', {contents});
     
 });
@@ -51,6 +59,30 @@ router.get('/:id/edit' , isLoggedIn,isAuthor, catchAsync(async(req,res) =>{
     res.render('contents/edit', {content});
 }));
 
+router.put('/:id/like', isLoggedIn, catchAsync(async(req,res) =>{
+    const { id } = req.params;
+    const currentContent= await Content.findById(id);
+    let currentUser =  currentContent.likes.includes(req.user._id);
+    if(currentUser){
+        req.flash('error' , 'You have already liked the story');
+        return res.redirect(`/contents/${id}`);
+    }
+    
+    Content.findByIdAndUpdate(id,{
+        $push:{likes:req.user._id},
+        $inc:{like: 1}
+        
+    },{
+        new:true
+    }).exec((err,result) =>{
+        if(err){
+          req.flash('error' , 'Can not find the content');
+          return res.redirect('/contents');
+        }
+    })
+    res.redirect(`/contents/${id}`);
+}));
+
 router.put('/:id',isLoggedIn, isAuthor, validateContent ,catchAsync(async(req,res) =>{
     const { id } = req.params;
     const content = await Content.findByIdAndUpdate(id, {...req.body.content});
@@ -63,7 +95,5 @@ router.delete('/:id',isLoggedIn,isAuthor, async(req,res) =>{
     await Content.findByIdAndDelete(id);
     res.redirect('/contents');
 })
-
-
 
 module.exports = router;

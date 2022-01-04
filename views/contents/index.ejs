@@ -6,6 +6,9 @@
     <div>
         <a href="/contents/newcontent">New Content</a>
     </div>
+    <div>
+        <a href="/contents/mostliked">Most Liked</a>
+    </div>
     <ul>
         <% for(let content of contents ) {%>
            <div class="card" mb-3>
@@ -20,6 +23,7 @@
                             <a class="btn btn-primary" href="/contents/<%= content._id %>">Show</a>
                             <% var currDate = content.datePublished.getDate() + "/" + content.datePublished.getMonth() + 1 +"/" +content.datePublished.getFullYear(); %> 
                             <p class="mt-3">Date Published: <%= currDate %></p>
+                            <p class="mt-3"><%= content.likes.length %> Likes</p>
                         </div>
                     </div>
                 </div>
