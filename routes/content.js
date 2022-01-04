@@ -19,12 +19,19 @@ router.get('/newcontent', async(req,res) =>{
 
     const contents = await Content.find({}).sort({datePublished: -1});    
     res.render('contents/index', {contents});
-    
+
 });
 
 router.get('/mostliked', async(req,res) =>{
 
     const contents = await Content.find({}).sort({like: -1});  
+    res.render('contents/index', {contents});
+    
+});
+
+router.get('/mostviewed', async(req,res) =>{
+
+    const contents = await Content.find({}).sort({views: -1});  
     res.render('contents/index', {contents});
     
 });
@@ -59,6 +66,29 @@ router.get('/:id/edit' , isLoggedIn,isAuthor, catchAsync(async(req,res) =>{
     res.render('contents/edit', {content});
 }));
 
+
+
+router.get('/:id/view', isLoggedIn, catchAsync(async(req,res) =>{
+    const { id } = req.params;
+    const currentContent= await Content.findById(id);
+    if(!currentContent){
+        req.flash('error' , 'Content does not exists');
+        return res.redirect(`/contents/${id}`);
+    }
+    
+    Content.findByIdAndUpdate(id,{
+        $inc:{views: 1}
+    },{
+        new:true
+    }).exec((err,result) =>{
+        if(err){
+          req.flash('error' , 'Can not find the content');
+          return res.redirect('/contents');
+        }
+    })
+    res.redirect(`/contents/${id}`);
+}));
+
 router.put('/:id/like', isLoggedIn, catchAsync(async(req,res) =>{
     const { id } = req.params;
     const currentContent= await Content.findById(id);
@@ -82,6 +112,10 @@ router.put('/:id/like', isLoggedIn, catchAsync(async(req,res) =>{
     })
     res.redirect(`/contents/${id}`);
 }));
+
+
+// http://localhost:3000/contents/61d45e268ce602398f677a8d/view?_method=PUT
+// http://localhost:3000/contents/61d45e268ce602398f677a8d
 
 router.put('/:id',isLoggedIn, isAuthor, validateContent ,catchAsync(async(req,res) =>{
     const { id } = req.params;

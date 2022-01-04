@@ -6,6 +6,7 @@ const ContentSchema = new Schema({
     image: String,
     story: String,
     like: Number,
+    views: Number,
     datePublished: Date,
     likes: [{type: Schema.Types.ObjectId, ref : 'User'}],
     author :{

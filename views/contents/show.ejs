@@ -12,17 +12,15 @@
                         <button class="btn btn-primary">Like</button>
                     </form>
                     <p class="mt-3"><%= content.likes.length %> Likes</p>
+                    <p class="mt-3"><%= content.views%> Views</p>
                     <% if(currentUser && content.author.equals(currentUser._id)){ %> 
                 
                         <a class="card-link btn btn-info" href="/contents/<%=content._id%>/edit">Edit</a>
                         <form class="d-inline" action="/contents/<%=content._id%>?_method=DELETE" method="POST">
                             <button class="btn btn-danger">Delete</button>
                         </form>
-                   
                     <% } %> 
                 </div>
-                
-               
                 <p class="ml-3">Submitted By <%= content.author.username  %> </p>
                 <div class="card-footer text-muted">
                 <% var currDate = content.datePublished.getDate() + "/" + content.datePublished.getMonth() + 1 +"/" +content.datePublished.getFullYear(); %> 
@@ -31,3 +29,14 @@
             </div>
         </div>
     </div>
+<script>
+    let name = "/contents/<%-content._id%>/view";
+    //alert(name);
+    $(window).on("scroll", function() {
+        var scrollHeight = $(document).height();
+        var scrollPosition = $(window).height() + $(window).scrollTop();
+        if ((scrollHeight - scrollPosition) / scrollHeight === 0) {
+          window.location = name;
+        }
+    });
+ </script>
