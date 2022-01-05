@@ -1,17 +1,25 @@
 <% layout('layouts/boilerplate')%>
-    <h1>All Contents</h1>
+<div class="container">  
+    <div class=" nav justify-content-center" style="margin-top:1px;">  
+      <div class="card  mb-2 " style="max-width: 20rem;">  
+            <div class="card-header"><h6>Upload csv file</h6></div>   
+            <div class="card-body">   
+               
+                    <form action="/" method="post" enctype="multipart/form-data">  
+                        <input type="file" name="csv"><br><br>
+                     <div class="text-center"><button type="submit" class="btn btn-sm btn-info">Submit</button></div>     
+                    </form>  
+             </div>  
+      </div>  
+</div> 
+    <h1>All Contents:</h1>
     <div>
-        <a href="/contents/new">Add Content</a>
+        <h5><a href="/contents/new"  class="ml-4">Add Content</a></h5>
+        <h5><a href="/contents/newcontent" class="ml-4">New Content</a></h5>
+        <h5><a href="/contents/mostliked"  class="ml-4">Most Liked</a></h5>
+        <h5><a href="/contents/mostviewed" class="ml-4">Most Viewed</a></h5> 
     </div>
-    <div>
-        <a href="/contents/newcontent">New Content</a>
-    </div>
-    <div>
-        <a href="/contents/mostliked">Most Liked</a>
-    </div>
-    <div>
-        <a href="/contents/mostviewed">Most Viewed</a>
-    </div>
+
     <ul>
         <% for(let content of contents ) {%>
            <div class="card" mb-3>

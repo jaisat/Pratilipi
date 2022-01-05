@@ -2,7 +2,6 @@ const express = require('express');
 const router  = express.Router();
 const catchAsync = require('../utils/catchAsync');
 const Content = require('../models/content');
-const User = require('../models/user');
 const Like = require('../models/like');
 const View = require('../models/view');
 const { isLoggedIn, isAuthor, validateContent } = require('../middleware');
@@ -38,6 +37,8 @@ router.get('/mostviewed', async(req,res) =>{
     
 });
 
+// router.post('/csv',)
+
 router.get('/:id',catchAsync( async(req,res) =>{
     const content = await Content.findById(req.params.id).populate('author');
     if(!content){
@@ -49,8 +50,8 @@ router.get('/:id',catchAsync( async(req,res) =>{
 
 router.post('/',isLoggedIn, validateContent, catchAsync( async(req,res,next) =>{
         
-        var date = new Date(); 
-        req.body.content.datePublished = date;
+        // var date = new Date(); 
+        // req.body.content.datePublished = date;
 
         const content = new Content(req.body.content);
         content.author = req.user._id;

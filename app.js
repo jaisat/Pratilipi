@@ -12,9 +12,28 @@ const LocalStrategy = require('passport-local');
 const User = require('./models/user');
 const flash = require('connect-flash');
 const session = require('express-session');
+const multer = require('multer');
+const csv      = require('csvtojson');  
+const bodyParser = require('body-parser');
+
 
 const contentRoutes = require('./routes/content');
 const userRoutes    = require('./routes/users');
+const { default: CSVError } = require('csvtojson/v2/CSVError');
+
+var storage = multer.diskStorage({  
+    destination:(req,file,cb)=>{  
+        cb(null,'./public/uploads');  
+    },  
+    filename:(req,file,cb)=>{  
+        cb(null,file.originalname);  
+    }  
+});
+
+var uploads = multer({storage:storage});
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(express.static(path.resolve(__dirname,'public')));  
+
 
 mongoose.connect('mongodb://localhost:27017/prati-lipi',{
     useNewUrlParser: true,
@@ -53,14 +72,9 @@ app.use(passport.initialize());
 app.use(passport.session()); 
 passport.use(new LocalStrategy(User.authenticate()));
 
-app.use(express.static('public'));
-
-
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser())
   
-
-
 app.use((req,res,next) =>{
     res.locals.currentUser = req.user;
     res.locals.success     = req.flash('success');
@@ -75,6 +89,37 @@ app.use('/contents', contentRoutes);
 app.get('/',(req,res) =>{
     res.render('home');
 })
+
+var temp;
+app.post('/',uploads.single('csv'),(req,res)=>{  
+    //convert csvfile to jsonArray     
+    csv()  
+   .fromFile(req.file.path)  
+   .then((jsonObj)=>{  
+       //console.log(jsonObj);  
+       //the jsonObj will contain all the data in JSONFormat.
+       //but we want columns Test1,Test2,Test3,Test4,Final data as number .
+       //becuase we set the dataType of these fields as Number in our mongoose.Schema(). 
+       //here we put a for loop and change these column value in number from string using parseFloat(). 
+       //here we use parseFloat() beause because these fields contain the float values.
+       for(var x=0;x<jsonObj;x++){  
+            temp = parseInt(jsonObj[x].viewCount)  
+            jsonObj[x].viewCount = temp;  
+            temp = parseFloat(jsonObj[x].likeCount);
+            jsonObj[x].likeCount = temp;  
+        } 
+        //insertmany is used to save bulk data in database.
+        //saving the data in collection(table)
+        Content.insertMany(jsonObj,(err,data)=>{  
+               if(err){  
+                   console.log(err);  
+               }else{  
+                   res.redirect('/contents');  
+               }  
+        });  
+      });  
+   });  
+     
 
 app.all('*',(req,res,next) =>{
     next(new ExpressError('Page Not Found', 404));
