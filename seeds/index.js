@@ -24,14 +24,14 @@ var arrayToInsert = [];
 csvtojson().fromFile(filename).then(source => {
 for(var i = 0; i < source.length; i++){
     var oneRow = {
-        author : '61d29eefdafa5f2a5ca792dc',
+        author : '61d53285d4ccccbd0a8c000e',
         title : source[i]['title'],
         story : source[i]['story'],
         image : 'https://images.unsplash.com/photo-1543635343-fd6e563d12da?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxjb2xsZWN0aW9uLXBhZ2V8MjZ8ODQzOTUwNXx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=500&q=60',
         datePublished : currDate,
         likes:[],
-        like: 0,
-        views:0
+        likeCount: 0,
+        viewCount :0
     };
     arrayToInsert.push(oneRow);
 }

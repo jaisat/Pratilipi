@@ -5,10 +5,11 @@ const ContentSchema = new Schema({
     title: String,
     image: String,
     story: String,
-    like: Number,
-    views: Number,
+    likeCount : Number,
+    viewCount : Number,
     datePublished: Date,
-    likes: [{type: Schema.Types.ObjectId, ref : 'User'}],
+    likes: [{type: Schema.Types.ObjectId, ref : 'Like'}],
+    views: [{type: Schema.Types.ObjectId, ref : 'Like'}],
     author :{
         type : Schema.Types.ObjectId,
         ref : 'User'

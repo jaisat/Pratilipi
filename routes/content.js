@@ -3,6 +3,8 @@ const router  = express.Router();
 const catchAsync = require('../utils/catchAsync');
 const Content = require('../models/content');
 const User = require('../models/user');
+const Like = require('../models/like');
+const View = require('../models/view');
 const { isLoggedIn, isAuthor, validateContent } = require('../middleware');
 
 
@@ -24,14 +26,14 @@ router.get('/newcontent', async(req,res) =>{
 
 router.get('/mostliked', async(req,res) =>{
 
-    const contents = await Content.find({}).sort({like: -1});  
+    const contents = await Content.find({}).sort({likeCount: -1});  
     res.render('contents/index', {contents});
     
 });
 
 router.get('/mostviewed', async(req,res) =>{
 
-    const contents = await Content.find({}).sort({views: -1});  
+    const contents = await Content.find({}).sort({viewCount: -1});  
     res.render('contents/index', {contents});
     
 });
@@ -67,17 +69,21 @@ router.get('/:id/edit' , isLoggedIn,isAuthor, catchAsync(async(req,res) =>{
 }));
 
 
-
 router.get('/:id/view', isLoggedIn, catchAsync(async(req,res) =>{
     const { id } = req.params;
+
+    const currentView = new View({view:req.user._id});
+    await currentView.save();
+
     const currentContent= await Content.findById(id);
+
     if(!currentContent){
         req.flash('error' , 'Content does not exists');
         return res.redirect(`/contents/${id}`);
     }
     
     Content.findByIdAndUpdate(id,{
-        $inc:{views: 1}
+        $inc:{viewCount : 1}
     },{
         new:true
     }).exec((err,result) =>{
@@ -91,16 +97,24 @@ router.get('/:id/view', isLoggedIn, catchAsync(async(req,res) =>{
 
 router.put('/:id/like', isLoggedIn, catchAsync(async(req,res) =>{
     const { id } = req.params;
-    const currentContent= await Content.findById(id);
-    let currentUser =  currentContent.likes.includes(req.user._id);
-    if(currentUser){
+    const currentLike =  new Like({like:req.user._id});
+    await currentLike.save();
+    
+    const currentContent = await Content.findById(id).populate({
+        path : 'likes',
+        match : {like : {$in : [req.user._id]} },
+        select : 'like -_id'
+    }).exec();
+    
+   
+    if(currentContent.likes.length){
         req.flash('error' , 'You have already liked the story');
         return res.redirect(`/contents/${id}`);
     }
     
     Content.findByIdAndUpdate(id,{
-        $push:{likes:req.user._id},
-        $inc:{like: 1}
+        $push:{likes: currentLike._id},
+        $inc:{likeCount : 1}
         
     },{
         new:true
@@ -113,9 +127,6 @@ router.put('/:id/like', isLoggedIn, catchAsync(async(req,res) =>{
     res.redirect(`/contents/${id}`);
 }));
 
-
-// http://localhost:3000/contents/61d45e268ce602398f677a8d/view?_method=PUT
-// http://localhost:3000/contents/61d45e268ce602398f677a8d
 
 router.put('/:id',isLoggedIn, isAuthor, validateContent ,catchAsync(async(req,res) =>{
     const { id } = req.params;
