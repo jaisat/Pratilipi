@@ -18,6 +18,7 @@ const bodyParser = require('body-parser');
 const contentRoutes = require('./routes/content');
 const userRoutes    = require('./routes/users');
 
+// for staoring csv file
 var storage = multer.diskStorage({  
     destination:(req,file,cb)=>{  
         cb(null,'./public/uploads');  
@@ -32,6 +33,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static(path.resolve(__dirname,'public')));  
 
 
+// Mongo connection 
 mongoose.connect('mongodb://mongodb:27017/prati-lipi',{
     useNewUrlParser: true,
     useUnifiedTopology : true,
@@ -47,6 +49,7 @@ app.engine('ejs',ejsMate);
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'views'));
 
+// session configuration
 const sessionConfig = {
     secret : 'thinkofabetterSecret',
     resave : false,
@@ -78,10 +81,11 @@ app.use((req,res,next) =>{
     next();
 })
 
+// using two main routes user and content
 app.use('/', userRoutes);
 app.use('/contents', contentRoutes);
 
-
+// home route
 app.get('/',(req,res) =>{
     res.render('home');
 })
@@ -117,7 +121,7 @@ app.post('/',uploads.single('csv'),(req,res)=>{
       });  
    });  
      
-
+// In case we won't get any matches 
 app.all('*',(req,res,next) =>{
     next(new ExpressError('Page Not Found', 404));
 })

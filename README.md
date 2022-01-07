@@ -73,3 +73,13 @@ PratiLipi is a web-application that serves variety of books and stories where us
 ```bash
  docker-compose up
 ```
+## User Credentials:
+```
+username: user
+password: user 
+username: user1
+password: user1
+username: satyam 
+password: satyam
+
+```
