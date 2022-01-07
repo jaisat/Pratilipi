@@ -50,8 +50,8 @@ router.get('/:id',catchAsync( async(req,res) =>{
 
 router.post('/',isLoggedIn, validateContent, catchAsync( async(req,res,next) =>{
         
-        // var date = new Date(); 
-        // req.body.content.datePublished = date;
+        var date = new Date(); 
+        req.body.content.datePublished = date;
 
         const content = new Content(req.body.content);
         content.author = req.user._id;

@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const Content = require('./models/content');
 const methodOverride = require('method-override');
 const ejsMate  = require('ejs-mate');
-const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
@@ -13,13 +12,11 @@ const User = require('./models/user');
 const flash = require('connect-flash');
 const session = require('express-session');
 const multer = require('multer');
-const csv      = require('csvtojson');  
+const csv  = require('csvtojson');  
 const bodyParser = require('body-parser');
-
 
 const contentRoutes = require('./routes/content');
 const userRoutes    = require('./routes/users');
-const { default: CSVError } = require('csvtojson/v2/CSVError');
 
 var storage = multer.diskStorage({  
     destination:(req,file,cb)=>{  
@@ -35,7 +32,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static(path.resolve(__dirname,'public')));  
 
 
-mongoose.connect('mongodb://localhost:27017/prati-lipi',{
+mongoose.connect('mongodb://mongodb:27017/prati-lipi',{
     useNewUrlParser: true,
     useUnifiedTopology : true,
 });
@@ -60,7 +57,6 @@ const sessionConfig = {
         maxAge :  1000 * 60 * 60 *24 * 7
     }
 }
-
 
 app.use(session(sessionConfig));
 app.use(flash());
@@ -90,6 +86,7 @@ app.get('/',(req,res) =>{
     res.render('home');
 })
 
+// Data ingestion in database through csv File.
 var temp;
 app.post('/',uploads.single('csv'),(req,res)=>{  
     //convert csvfile to jsonArray     
@@ -98,14 +95,14 @@ app.post('/',uploads.single('csv'),(req,res)=>{
    .then((jsonObj)=>{  
        //console.log(jsonObj);  
        //the jsonObj will contain all the data in JSONFormat.
-       //but we want columns Test1,Test2,Test3,Test4,Final data as number .
+       //but we want columns likeCount, viewCount Final data as number .
        //becuase we set the dataType of these fields as Number in our mongoose.Schema(). 
-       //here we put a for loop and change these column value in number from string using parseFloat(). 
-       //here we use parseFloat() beause because these fields contain the float values.
+       //here we put a for loop and change these column value in number from string using parseInt(). 
+       //here we use parseInt() beause because these fields contain the Int values.
        for(var x=0;x<jsonObj;x++){  
             temp = parseInt(jsonObj[x].viewCount)  
             jsonObj[x].viewCount = temp;  
-            temp = parseFloat(jsonObj[x].likeCount);
+            temp = parseFloat(jsonObj[x].likeCount); 
             jsonObj[x].likeCount = temp;  
         } 
         //insertmany is used to save bulk data in database.
