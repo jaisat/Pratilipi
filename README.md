@@ -50,11 +50,15 @@ PratiLipi is a web-application that serves variety of books and stories where us
    - An API to help us post the csv file, and it automatically invoke the data ingestion process once it receives the csv file.
    - csv file must contain title, story, author as an reference to user, image link.
 ## Database Schema:
+<img src="/img/schema.png">  
    - Content
       - <img src="/img/contentdb.png">  
    - User
+      - <img src="/img/userdb.png">  
    - Like
+      - <img src="/img/likedb.png">  
    - View
+      - <img src="/img/viewdb.png">  
 
 ## Installation:
 
