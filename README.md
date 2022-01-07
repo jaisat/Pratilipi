@@ -51,7 +51,7 @@ PratiLipi is a web-application that serves variety of books and stories where us
    - csv file must contain title, story, author as an reference to user, image link.
 ## Database Schema:
    - Content
-      - <img src="/img/contentdb.png" width="350">  
+      - <img src="/img/contentdb.png">  
    - User
    - Like
    - View
