@@ -21,10 +21,13 @@ PratiLipi is a web-application that serves variety of books and stories where us
  - Includes Title, Story, user who submitted the story, Number of Likes and Number of views,Id of users who has liked the story, date at which it has been published.
  - User can read more about story more by clicking the show button provided on each story can be updated only if user is authorized.
  - A single user can like a particular content once but can view a content as many times they wants.
+<img src="/img/home.png"> 
 
 ## User Service:
  - Login/register page for user to signin and register to web-application.
  - Users can update their information by going to Edit User.
+<img src="/img/edit.png"> 
+
 ## User Interaction Service:
  - User Like Event:
     - A user can like a story/content only if they are logged in first otherwise they will be redirected to login page.
@@ -36,6 +39,8 @@ PratiLipi is a web-application that serves variety of books and stories where us
     - Counting of a view has done on the basis of if user has completely read the story.For that an event gets triggered when user will reach at last of the page.
     - With a help of script we count views and incrementing alredy existing count of views.
     - A user can read a story as many times as they want.
+<img src="/img/show.png"> 
+
 ## API's Created:
  - New Content:
    - An API which is sorting the content on the basis of date it has been published(Most recent one's).
