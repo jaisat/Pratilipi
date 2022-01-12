@@ -14,12 +14,12 @@ router.get('/',catchAsync( async(req,res) => {
 
 
 // New Content page to write story
-router.get('/new',isLoggedIn ,(req,res) => {
+router.get('/new', isLoggedIn, (req,res) => {
     res.render('contents/new');
 });
 
 // sorting on the basis of date Published
-router.get('/newcontent', async(req,res) =>{
+router.get('/newcontent', isLoggedIn, async(req,res) =>{
     const contents = await Content.find({}).sort({datePublished: -1});    
     res.render('contents/index', {contents});
 });

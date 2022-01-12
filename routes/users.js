@@ -13,6 +13,7 @@ router.get('/register',(req,res) =>{
 // post route for regitration
 router.post('/register',catchAsync(async(req,res) =>{
     try{
+        //console.log(req.body);
         const {username,firstName, lastName, email, telNo, password} = req.body;
         // making a new user object and storing in database.
         const user =  new User({username,firstName, lastName, email, telNo});
@@ -40,15 +41,16 @@ router.post('/login' , passport.authenticate('local', { failureFlash : true, fai
 })
 
 // User can edit their information, edit page
-router.get('/edit', isLoggedIn, catchAsync( async(req,res) =>{
+router.get('/edit/:id', isLoggedIn, catchAsync( async(req,res) =>{
         const user = await User.findById(req.user._id);
         res.render('users/edit',{user});
 
 }));
 
 // post route for edit page
-router.put('/edit',isLoggedIn, catchAsync(async(req,res) =>{
+router.put('/edit/:id',isLoggedIn, catchAsync(async(req,res) =>{
     const id = req.user._id;
+    console.log(req.body);
     // finding the existing user by user_id
     const sanitizedUser = await User.findByIdAndUpdate(id, {...req.body.user});
     // incase user wants to update their password

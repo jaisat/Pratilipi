@@ -4,7 +4,8 @@ const Content = require('./models/content');
 const User    = require('./models/user');
 
 module.exports.isLoggedIn = (req,res,next) =>{
-    if(!req.isAuthenticated()){
+    //console.log(req.user);
+    if(!req.user){
         req.flash('error','You Must be signed In First');
         return res.redirect('/login');
     }
